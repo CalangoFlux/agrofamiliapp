@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sun, Cloud, CloudRain, Thermometer, Droplets, Wind } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface WeatherData {
   temperature: number
@@ -20,24 +21,51 @@ interface WeatherData {
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedLocation, setSelectedLocation] = useState("São Paulo, SP")
+  const [availableLocations] = useState([
+    "São Paulo, SP",
+    "Rio de Janeiro, RJ",
+    "Belo Horizonte, MG",
+    "Porto Alegre, RS",
+    "Curitiba, PR",
+    "Fortaleza, CE",
+    "Recife, PE",
+    "Salvador, BA",
+    "Brasília, DF",
+    "Goiânia, GO",
+  ])
 
   useEffect(() => {
-    // Simular chamada para API de clima
     const fetchWeather = async () => {
       try {
-        // Em produção, aqui seria uma chamada real para OpenWeatherMap ou similar
         setTimeout(() => {
+          // Simular dados diferentes baseados na localização
+          const locationData = {
+            "São Paulo, SP": { temp: 28, humidity: 65, wind: 12, condition: "Ensolarado" },
+            "Rio de Janeiro, RJ": { temp: 32, humidity: 78, wind: 8, condition: "Parcialmente nublado" },
+            "Belo Horizonte, MG": { temp: 26, humidity: 60, wind: 10, condition: "Ensolarado" },
+            "Porto Alegre, RS": { temp: 22, humidity: 85, wind: 15, condition: "Chuvoso" },
+            "Curitiba, PR": { temp: 20, humidity: 70, wind: 12, condition: "Nublado" },
+            "Fortaleza, CE": { temp: 30, humidity: 80, wind: 18, condition: "Ensolarado" },
+            "Recife, PE": { temp: 29, humidity: 82, wind: 16, condition: "Parcialmente nublado" },
+            "Salvador, BA": { temp: 28, humidity: 75, wind: 14, condition: "Ensolarado" },
+            "Brasília, DF": { temp: 25, humidity: 55, wind: 8, condition: "Ensolarado" },
+            "Goiânia, GO": { temp: 27, humidity: 58, wind: 9, condition: "Parcialmente nublado" },
+          }
+
+          const data = locationData[selectedLocation] || locationData["São Paulo, SP"]
+
           setWeather({
-            temperature: 28,
-            humidity: 65,
-            windSpeed: 12,
-            condition: "Ensolarado",
+            temperature: data.temp,
+            humidity: data.humidity,
+            windSpeed: data.wind,
+            condition: data.condition,
             forecast: [
-              { day: "Hoje", temp: 28, condition: "Ensolarado", rain: 0 },
-              { day: "Amanhã", temp: 26, condition: "Parcialmente nublado", rain: 20 },
-              { day: "Ter", temp: 24, condition: "Chuvoso", rain: 80 },
-              { day: "Qua", temp: 22, condition: "Chuvoso", rain: 90 },
-              { day: "Qui", temp: 25, condition: "Nublado", rain: 40 },
+              { day: "Hoje", temp: data.temp, condition: data.condition, rain: Math.random() * 100 },
+              { day: "Amanhã", temp: data.temp - 2, condition: "Parcialmente nublado", rain: Math.random() * 100 },
+              { day: "Ter", temp: data.temp - 1, condition: "Nublado", rain: Math.random() * 100 },
+              { day: "Qua", temp: data.temp + 1, condition: "Ensolarado", rain: Math.random() * 100 },
+              { day: "Qui", temp: data.temp + 2, condition: "Ensolarado", rain: Math.random() * 100 },
             ],
           })
           setLoading(false)
@@ -49,7 +77,7 @@ export function WeatherWidget() {
     }
 
     fetchWeather()
-  }, [])
+  }, [selectedLocation])
 
   const getWeatherIcon = (condition: string) => {
     switch (condition.toLowerCase()) {
@@ -97,9 +125,23 @@ export function WeatherWidget() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          {getWeatherIcon(weather.condition)}
-          <span>Condições Climáticas - Hoje</span>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            {getWeatherIcon(weather?.condition || "")}
+            <span>Condições Climáticas</span>
+          </div>
+          <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availableLocations.map((location) => (
+                <SelectItem key={location} value={location}>
+                  {location}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardTitle>
       </CardHeader>
       <CardContent>

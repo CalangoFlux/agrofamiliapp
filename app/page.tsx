@@ -32,6 +32,7 @@ import {
   Zap,
 } from "lucide-react"
 import { DatabaseStatus } from "@/components/database-status"
+import { AgroecologySection } from "@/components/agroecology-section"
 
 interface WeatherData {
   temperature: number
@@ -267,7 +268,7 @@ export default function AgroFamiliApp() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
             <TabsTrigger value="dashboard" className="flex items-center space-x-1">
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -283,6 +284,10 @@ export default function AgroFamiliApp() {
             <TabsTrigger value="recursos" className="flex items-center space-x-1">
               <DollarSign className="h-4 w-4" />
               <span className="hidden sm:inline">Recursos</span>
+            </TabsTrigger>
+            <TabsTrigger value="agroecologia" className="flex items-center space-x-1">
+              <Leaf className="h-4 w-4" />
+              <span className="hidden sm:inline">Agroecologia</span>
             </TabsTrigger>
             <TabsTrigger value="mercado" className="flex items-center space-x-1">
               <ShoppingCart className="h-4 w-4" />
@@ -538,9 +543,24 @@ export default function AgroFamiliApp() {
                     <li>• Comprovante de residência</li>
                     <li>• Documento do imóvel rural</li>
                   </ul>
-                  <Button className="w-full mt-4 bg-transparent" variant="outline">
-                    Saiba mais
-                  </Button>
+                  <div className="space-y-2 mt-4">
+                    <Button
+                      className="w-full bg-transparent"
+                      variant="outline"
+                      onClick={() =>
+                        window.open("https://www.gov.br/pt-br/servicos/emitir-o-documento-caf-pronaf", "_blank")
+                      }
+                    >
+                      Emitir CAF/PRONAF
+                    </Button>
+                    <Button
+                      className="w-full bg-transparent"
+                      variant="outline"
+                      onClick={() => window.open("https://dap.mda.gov.br/", "_blank")}
+                    >
+                      Sistema DAP
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -559,8 +579,17 @@ export default function AgroFamiliApp() {
                     <li>• Documento da propriedade</li>
                     <li>• Taxa de emissão</li>
                   </ul>
-                  <Button className="w-full mt-4 bg-transparent" variant="outline">
-                    Saiba mais
+                  <Button
+                    className="w-full mt-4 bg-transparent"
+                    variant="outline"
+                    onClick={() =>
+                      window.open(
+                        "https://sebrae.com.br/sites/PortalSebrae/ufs/ap/artigos/como-obter-o-cartao-de-produtor-rural,c16a5ce5deb2f510VgnVCM1000004c00210aRCRD",
+                        "_blank",
+                      )
+                    }
+                  >
+                    Como Obter - SEBRAE
                   </Button>
                 </CardContent>
               </Card>
@@ -580,8 +609,17 @@ export default function AgroFamiliApp() {
                     <li>• Controle de insumos</li>
                     <li>• Auditoria técnica</li>
                   </ul>
-                  <Button className="w-full mt-4 bg-transparent" variant="outline">
-                    Saiba mais
+                  <Button
+                    className="w-full mt-4 bg-transparent"
+                    variant="outline"
+                    onClick={() =>
+                      window.open(
+                        "https://www.gov.br/pt-br/servicos/obter-certificacao-de-produtos-organicos-producao-primaria-vegetal",
+                        "_blank",
+                      )
+                    }
+                  >
+                    Certificação Orgânica - Gov.br
                   </Button>
                 </CardContent>
               </Card>
@@ -611,14 +649,26 @@ export default function AgroFamiliApp() {
                       <Badge>Até 10 anos</Badge>
                     </div>
                   </div>
-                  <Button className="w-full mt-4">Solicitar</Button>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() =>
+                      window.open(
+                        "https://www.gov.br/pt-br/servicos/acessar-o-programa-nacional-de-fortalecimento-da-agricultura-familiar-pronaf",
+                        "_blank",
+                      )
+                    }
+                  >
+                    Acessar PRONAF
+                  </Button>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-blue-600">PRONAMP</CardTitle>
-                  <CardDescription>Programa Nacional de Apoio ao Médio Produtor Rural</CardDescription>
+                  <CardTitle className="text-blue-600">PRONAMPE</CardTitle>
+                  <CardDescription>
+                    Programa Nacional de Apoio às Microempresas e Empresas de Pequeno Porte
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -628,17 +678,27 @@ export default function AgroFamiliApp() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">Limite:</span>
-                      <Badge>Até R$ 2.000.000</Badge>
+                      <Badge>Até R$ 150.000</Badge>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm">Prazo:</span>
-                      <Badge>Até 12 anos</Badge>
+                      <Badge>Até 48 meses</Badge>
                     </div>
                   </div>
-                  <Button className="w-full mt-4">Solicitar</Button>
+                  <Button
+                    className="w-full mt-4"
+                    onClick={() => window.open("https://www.gov.br/memp/pt-br/programa-acredita/pronampe", "_blank")}
+                  >
+                    Acessar PRONAMPE
+                  </Button>
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Agroecologia */}
+          <TabsContent value="agroecologia" className="space-y-6">
+            <AgroecologySection />
           </TabsContent>
 
           {/* Mercado */}
@@ -769,11 +829,22 @@ export default function AgroFamiliApp() {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
-                  <span>contato@agrofamiliapp.gov.br</span>
+                  <span>AgroFamiliAPP@proton.me</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
                   <span>0800 123 4567</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4" />
+                  <a
+                    href="https://t.me/CalangoFlux"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    Desenvolvedor: @CalangoFlux
+                  </a>
                 </div>
               </div>
             </div>
