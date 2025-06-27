@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, XCircle, Database, Users, Newspaper, DollarSign, ShoppingCart, Cloud } from "lucide-react"
+import { useSupabase } from "@/components/supabase-provider"
 
 interface DatabaseStats {
   farmers: number
@@ -19,7 +19,8 @@ export function DatabaseStatus() {
   const [stats, setStats] = useState<DatabaseStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClientComponentClient()
+  // const supabase = createClientComponentClient()
+  const { supabase } = useSupabase()
 
   useEffect(() => {
     const checkDatabase = async () => {

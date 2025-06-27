@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -35,6 +33,7 @@ import { WeatherWidget } from "@/components/weather-widget"
 import { NewsSection } from "@/components/news-section"
 import { NewsAutomationGuide } from "@/components/news-automation-guide"
 import { ClimateCreditsSection } from "@/components/climate-credits-section"
+import { useSupabase } from "@/components/supabase-provider"
 
 interface WeatherData {
   temperature: number
@@ -68,7 +67,7 @@ export default function AgroFamiliApp() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [farmers, setFarmers] = useState<Farmer[]>([])
   const [loading, setLoading] = useState(false)
-  const supabase = createClientComponentClient()
+  const { supabase } = useSupabase()
 
   // Buscar dados reais do Supabase
   useEffect(() => {
