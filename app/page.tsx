@@ -13,10 +13,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
-  MapPin,
-  Thermometer,
-  Droplets,
-  Sun,
   TrendingUp,
   Leaf,
   Users,
@@ -30,9 +26,13 @@ import {
   Award,
   Target,
   Zap,
+  ExternalLink,
 } from "lucide-react"
 import { DatabaseStatus } from "@/components/database-status"
 import { AgroecologySection } from "@/components/agroecology-section"
+import { WeatherWidget } from "@/components/weather-widget"
+import { NewsSection } from "@/components/news-section"
+import { NewsAutomationGuide } from "@/components/news-automation-guide"
 
 interface WeatherData {
   temperature: number
@@ -116,89 +116,6 @@ export default function AgroFamiliApp() {
     fetchData()
   }, [supabase])
 
-  // Simular dados de clima
-  useEffect(() => {
-    const fetchWeather = async () => {
-      // Simulando API call
-      setTimeout(() => {
-        setWeather({
-          temperature: 28,
-          humidity: 65,
-          description: "Ensolarado",
-          location: "São Paulo, SP",
-        })
-      }, 1000)
-    }
-    fetchWeather()
-  }, [])
-
-  // Simular notícias
-  useEffect(() => {
-    const mockNews: NewsItem[] = [
-      {
-        id: 1,
-        title: "Novo programa de crédito PRONAF 2024 é lançado",
-        summary:
-          "Governo federal anuncia novas condições especiais para financiamento da agricultura familiar com juros reduzidos.",
-        date: "2024-01-15",
-        category: "Programas Governamentais",
-        source: "Ministério da Agricultura",
-      },
-      {
-        id: 2,
-        title: "Feira Nacional da Agricultura Familiar bate recorde",
-        summary:
-          "Evento em Brasília movimenta R$ 15 milhões em negócios e reúne mais de 500 produtores de todo o país.",
-        date: "2024-01-14",
-        category: "Mercado",
-        source: "CONAB",
-      },
-      {
-        id: 3,
-        title: "Tecnologia ajuda pequenos produtores a aumentar produtividade",
-        summary: "Aplicativos móveis e sensores IoT revolucionam a gestão de propriedades rurais familiares.",
-        date: "2024-01-13",
-        category: "Tecnologia",
-        source: "EMBRAPA",
-      },
-    ]
-    setNews(mockNews)
-  }, [])
-
-  // Dados de exemplo de agricultores
-  useEffect(() => {
-    const mockFarmers: Farmer[] = [
-      {
-        id: 1,
-        name: "João Silva",
-        location: "Campinas, SP",
-        products: ["Hortaliças", "Milho", "Feijão"],
-        size: 5,
-        hasDAP: true,
-        coordinates: [-47.0608, -22.9068],
-      },
-      {
-        id: 2,
-        name: "Maria Santos",
-        location: "Fortaleza, CE",
-        products: ["Frutas tropicais", "Mandioca"],
-        size: 3,
-        hasDAP: true,
-        coordinates: [-38.5267, -3.7319],
-      },
-      {
-        id: 3,
-        name: "Pedro Oliveira",
-        location: "Porto Alegre, RS",
-        products: ["Leite", "Queijos"],
-        size: 12,
-        hasDAP: false,
-        coordinates: [-51.2177, -30.0346],
-      },
-    ]
-    setFarmers(mockFarmers)
-  }, [])
-
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -268,7 +185,7 @@ export default function AgroFamiliApp() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:grid-cols-7">
+          <TabsList className="grid w-full grid-cols-8 lg:grid-cols-8">
             <TabsTrigger value="dashboard" className="flex items-center space-x-1">
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -297,6 +214,10 @@ export default function AgroFamiliApp() {
               <Newspaper className="h-4 w-4" />
               <span className="hidden sm:inline">Notícias</span>
             </TabsTrigger>
+            <TabsTrigger value="automacao" className="flex items-center space-x-1">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Auto</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Dashboard */}
@@ -304,7 +225,7 @@ export default function AgroFamiliApp() {
             {/* Hero Section */}
             <div
               className="relative h-64 bg-cover bg-center rounded-lg overflow-hidden"
-              style={{ backgroundImage: "url('/images/hero-bg.png')" }}
+              style={{ backgroundImage: "url('/placeholder.svg?height=300&width=800&text=AgroFamiliAPP')" }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                 <div className="text-center text-white">
@@ -318,53 +239,7 @@ export default function AgroFamiliApp() {
             <DatabaseStatus />
 
             {/* Weather Widget */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Sun className="h-5 w-5 text-yellow-500" />
-                  <span>Condições Climáticas</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {weather ? (
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="flex items-center space-x-3">
-                      <Thermometer className="h-8 w-8 text-red-500" />
-                      <div>
-                        <p className="text-2xl font-bold">{weather.temperature}°C</p>
-                        <p className="text-sm text-gray-600">Temperatura</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Droplets className="h-8 w-8 text-blue-500" />
-                      <div>
-                        <p className="text-2xl font-bold">{weather.humidity}%</p>
-                        <p className="text-sm text-gray-600">Umidade</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Sun className="h-8 w-8 text-yellow-500" />
-                      <div>
-                        <p className="text-lg font-bold">{weather.description}</p>
-                        <p className="text-sm text-gray-600">Condição</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="h-8 w-8 text-green-500" />
-                      <div>
-                        <p className="text-lg font-bold">{weather.location}</p>
-                        <p className="text-sm text-gray-600">Localização</p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-20">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-                    <span className="ml-2">Carregando dados climáticos...</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <WeatherWidget />
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -394,8 +269,8 @@ export default function AgroFamiliApp() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">R$ 2.4M</div>
-                  <p className="text-xs text-muted-foreground">Em programas de crédito</p>
+                  <div className="text-2xl font-bold">R$ 48B</div>
+                  <p className="text-xs text-muted-foreground">Plano Safra 2024/25</p>
                 </CardContent>
               </Card>
               <Card>
@@ -410,7 +285,7 @@ export default function AgroFamiliApp() {
               </Card>
             </div>
 
-            {/* Recent News */}
+            {/* Recent News Preview */}
             <Card>
               <CardHeader>
                 <CardTitle>Últimas Notícias</CardTitle>
@@ -418,19 +293,32 @@ export default function AgroFamiliApp() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {news.slice(0, 3).map((item) => (
-                    <div key={item.id} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{item.title}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{item.summary}</p>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <Badge variant="secondary">{item.category}</Badge>
-                          <span className="text-xs text-gray-500">{item.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium">FAO lança programa para fortalecer agricultura familiar no Brasil</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Investimento de US$ 50 milhões para apoiar pequenos produtores brasileiros.
+                    </p>
+                    <Badge variant="secondary" className="mt-2">
+                      Internacional
+                    </Badge>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium">PAA amplia modalidades de compra para agricultura familiar</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Novas modalidades beneficiam mais de 300 mil famílias produtoras.
+                    </p>
+                    <Badge variant="secondary" className="mt-2">
+                      Programas Governamentais
+                    </Badge>
+                  </div>
                 </div>
+                <Button
+                  className="w-full mt-4 bg-transparent"
+                  variant="outline"
+                  onClick={() => setActiveTab("noticias")}
+                >
+                  Ver Todas as Notícias
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -447,38 +335,38 @@ export default function AgroFamiliApp() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="nome">Nome completo</Label>
-                      <Input id="nome" placeholder="Seu nome completo" required />
+                      <Input id="nome" name="nome" placeholder="Seu nome completo" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cpf">CPF</Label>
-                      <Input id="cpf" placeholder="000.000.000-00" required />
+                      <Input id="cpf" name="cpf" placeholder="000.000.000-00" required />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">E-mail</Label>
-                      <Input id="email" type="email" placeholder="seu@email.com" required />
+                      <Input id="email" name="email" type="email" placeholder="seu@email.com" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="telefone">Telefone</Label>
-                      <Input id="telefone" placeholder="(00) 00000-0000" required />
+                      <Input id="telefone" name="telefone" placeholder="(00) 00000-0000" required />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="endereco">Endereço da propriedade</Label>
-                    <Input id="endereco" placeholder="Endereço completo" required />
+                    <Input id="endereco" name="endereco" placeholder="Endereço completo" required />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="municipio">Município</Label>
-                      <Input id="municipio" placeholder="Sua cidade" required />
+                      <Input id="municipio" name="municipio" placeholder="Sua cidade" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="estado">Estado</Label>
-                      <Select>
+                      <Select name="estado">
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o estado" />
                         </SelectTrigger>
@@ -494,18 +382,23 @@ export default function AgroFamiliApp() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cep">CEP</Label>
-                      <Input id="cep" placeholder="00000-000" required />
+                      <Input id="cep" name="cep" placeholder="00000-000" required />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="produtos">Principais produtos cultivados</Label>
-                    <Textarea id="produtos" placeholder="Ex: milho, feijão, hortaliças, leite, etc." required />
+                    <Textarea
+                      id="produtos"
+                      name="produtos"
+                      placeholder="Ex: milho, feijão, hortaliças, leite, etc."
+                      required
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="tamanho">Tamanho da propriedade (hectares)</Label>
-                    <Input id="tamanho" type="number" min="0" step="0.01" required />
+                    <Input id="tamanho" name="tamanho" type="number" min="0" step="0.01" required />
                   </div>
 
                   <Button type="submit" className="w-full" disabled={loading}>
@@ -551,6 +444,7 @@ export default function AgroFamiliApp() {
                         window.open("https://www.gov.br/pt-br/servicos/emitir-o-documento-caf-pronaf", "_blank")
                       }
                     >
+                      <ExternalLink className="h-4 w-4 mr-2" />
                       Emitir CAF/PRONAF
                     </Button>
                     <Button
@@ -558,6 +452,7 @@ export default function AgroFamiliApp() {
                       variant="outline"
                       onClick={() => window.open("https://dap.mda.gov.br/", "_blank")}
                     >
+                      <ExternalLink className="h-4 w-4 mr-2" />
                       Sistema DAP
                     </Button>
                   </div>
@@ -589,6 +484,7 @@ export default function AgroFamiliApp() {
                       )
                     }
                   >
+                    <ExternalLink className="h-4 w-4 mr-2" />
                     Como Obter - SEBRAE
                   </Button>
                 </CardContent>
@@ -619,7 +515,8 @@ export default function AgroFamiliApp() {
                       )
                     }
                   >
-                    Certificação Orgânica - Gov.br
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Certificação Orgânica
                   </Button>
                 </CardContent>
               </Card>
@@ -658,6 +555,7 @@ export default function AgroFamiliApp() {
                       )
                     }
                   >
+                    <ExternalLink className="h-4 w-4 mr-2" />
                     Acessar PRONAF
                   </Button>
                 </CardContent>
@@ -689,6 +587,7 @@ export default function AgroFamiliApp() {
                     className="w-full mt-4"
                     onClick={() => window.open("https://www.gov.br/memp/pt-br/programa-acredita/pronampe", "_blank")}
                   >
+                    <ExternalLink className="h-4 w-4 mr-2" />
                     Acessar PRONAMPE
                   </Button>
                 </CardContent>
@@ -706,20 +605,54 @@ export default function AgroFamiliApp() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Programas de Compra</CardTitle>
+                  <CardTitle>Programas de Compra Governamental</CardTitle>
                   <CardDescription>Oportunidades de venda para o governo</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="p-3 border rounded-lg">
                       <h4 className="font-medium">PAA - Programa de Aquisição de Alimentos</h4>
-                      <p className="text-sm text-gray-600">Venda direta para o governo federal</p>
-                      <Badge className="mt-2">Chamada Aberta</Badge>
+                      <p className="text-sm text-gray-600 mb-2">Venda direta para o governo federal</p>
+                      <Badge className="mb-2">Chamada Aberta</Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full bg-transparent"
+                        onClick={() => window.open("https://paa.mds.gov.br/page/", "_blank")}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Acessar PAA
+                      </Button>
                     </div>
                     <div className="p-3 border rounded-lg">
                       <h4 className="font-medium">PNAE - Alimentação Escolar</h4>
-                      <p className="text-sm text-gray-600">Fornecimento para escolas públicas</p>
-                      <Badge className="mt-2">Chamada Aberta</Badge>
+                      <p className="text-sm text-gray-600 mb-2">Fornecimento para escolas públicas</p>
+                      <Badge className="mb-2">Chamada Aberta</Badge>
+                      <div className="space-y-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full bg-transparent"
+                          onClick={() =>
+                            window.open(
+                              "https://www.gov.br/fnde/pt-br/acesso-a-informacao/acoes-e-programas/programas/pnae",
+                              "_blank",
+                            )
+                          }
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          PNAE - FNDE
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full bg-transparent"
+                          onClick={() => window.open("https://www.fnde.gov.br/1ccr/pnae.html", "_blank")}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Portal FNDE
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -764,29 +697,12 @@ export default function AgroFamiliApp() {
 
           {/* Notícias */}
           <TabsContent value="noticias" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Últimas Notícias</CardTitle>
-                <CardDescription>Fique atualizado sobre agricultura familiar</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {news.map((item) => (
-                    <div key={item.id} className="border-b pb-4 last:border-b-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-lg">{item.title}</h3>
-                        <Badge variant="outline">{item.category}</Badge>
-                      </div>
-                      <p className="text-gray-600 mb-2">{item.summary}</p>
-                      <div className="flex justify-between items-center text-sm text-gray-500">
-                        <span>{item.source}</span>
-                        <span>{new Date(item.date).toLocaleDateString("pt-BR")}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <NewsSection />
+          </TabsContent>
+
+          {/* Automação */}
+          <TabsContent value="automacao" className="space-y-6">
+            <NewsAutomationGuide />
           </TabsContent>
         </Tabs>
       </div>
@@ -797,29 +713,68 @@ export default function AgroFamiliApp() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-lg font-bold mb-4">AgroFamiliAPP</h3>
-              <p className="text-sm">Plataforma completa para fortalecimento da agricultura familiar no Brasil.</p>
+              <p className="text-sm leading-relaxed">
+                Plataforma completa para fortalecimento da agricultura familiar no Brasil, promoção da soberania
+                alimentar, incentivo ao direito de acesso à alimentação saudável e de real valor nutricional,
+                impulsionamento de Sistemas Regenerativos.
+              </p>
             </div>
             <div>
               <h4 className="font-medium mb-4">Links Úteis</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a
+                    href="https://www.gov.br/agricultura/pt-br"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
                     Ministério da Agricultura
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a
+                    href="https://www.gov.br/incra/pt-br"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
                     INCRA
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a
+                    href="https://www.embrapa.br/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
                     EMBRAPA
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:underline">
+                  <a
+                    href="https://www.conab.gov.br/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
                     CONAB
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.fao.org/brasil/pt/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline flex items-center"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    FAO Brasil
                   </a>
                 </li>
               </ul>
@@ -833,10 +788,6 @@ export default function AgroFamiliApp() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4" />
-                  <span>0800 123 4567</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Users className="h-4 w-4" />
                   <a
                     href="https://t.me/CalangoFlux"
                     target="_blank"
@@ -850,7 +801,21 @@ export default function AgroFamiliApp() {
             </div>
           </div>
           <div className="border-t border-green-500 mt-8 pt-4 text-center text-sm">
-            <p>&copy; 2024 AgroFamiliAPP - Todos os direitos reservados</p>
+            <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+              <p>&copy; 2025 AgroFamiliAPP - Todos os direitos reservados</p>
+              <p className="text-green-200">
+                Desenvolvido por{" "}
+                <a
+                  href="https://t.me/CalangoFlux"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium hover:underline"
+                >
+                  CalangoFlux
+                </a>{" "}
+                | Tecnologia a serviço da agricultura familiar
+              </p>
+            </div>
           </div>
         </div>
       </footer>

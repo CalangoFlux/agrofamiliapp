@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Sun, Cloud, CloudRain, Thermometer, Droplets, Wind } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Sun, Cloud, CloudRain, Thermometer, Droplets, Wind, MapPin, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface WeatherData {
   temperature: number
   humidity: number
   windSpeed: number
   condition: string
+  location: string
   forecast: Array<{
     day: string
     temp: number
@@ -18,66 +19,140 @@ interface WeatherData {
   }>
 }
 
+interface LocationData {
+  latitude: number
+  longitude: number
+  city: string
+  state: string
+}
+
 export function WeatherWidget() {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedLocation, setSelectedLocation] = useState("São Paulo, SP")
-  const [availableLocations] = useState([
-    "São Paulo, SP",
-    "Rio de Janeiro, RJ",
-    "Belo Horizonte, MG",
-    "Porto Alegre, RS",
-    "Curitiba, PR",
-    "Fortaleza, CE",
-    "Recife, PE",
-    "Salvador, BA",
-    "Brasília, DF",
-    "Goiânia, GO",
-  ])
+  const [location, setLocation] = useState<LocationData | null>(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        setTimeout(() => {
-          // Simular dados diferentes baseados na localização
-          const locationData = {
-            "São Paulo, SP": { temp: 28, humidity: 65, wind: 12, condition: "Ensolarado" },
-            "Rio de Janeiro, RJ": { temp: 32, humidity: 78, wind: 8, condition: "Parcialmente nublado" },
-            "Belo Horizonte, MG": { temp: 26, humidity: 60, wind: 10, condition: "Ensolarado" },
-            "Porto Alegre, RS": { temp: 22, humidity: 85, wind: 15, condition: "Chuvoso" },
-            "Curitiba, PR": { temp: 20, humidity: 70, wind: 12, condition: "Nublado" },
-            "Fortaleza, CE": { temp: 30, humidity: 80, wind: 18, condition: "Ensolarado" },
-            "Recife, PE": { temp: 29, humidity: 82, wind: 16, condition: "Parcialmente nublado" },
-            "Salvador, BA": { temp: 28, humidity: 75, wind: 14, condition: "Ensolarado" },
-            "Brasília, DF": { temp: 25, humidity: 55, wind: 8, condition: "Ensolarado" },
-            "Goiânia, GO": { temp: 27, humidity: 58, wind: 9, condition: "Parcialmente nublado" },
-          }
+  // Função para obter localização do usuário
+  const getCurrentLocation = () => {
+    setLoading(true)
+    setLocationError(null)
 
-          const data = locationData[selectedLocation] || locationData["São Paulo, SP"]
-
-          setWeather({
-            temperature: data.temp,
-            humidity: data.humidity,
-            windSpeed: data.wind,
-            condition: data.condition,
-            forecast: [
-              { day: "Hoje", temp: data.temp, condition: data.condition, rain: Math.random() * 100 },
-              { day: "Amanhã", temp: data.temp - 2, condition: "Parcialmente nublado", rain: Math.random() * 100 },
-              { day: "Ter", temp: data.temp - 1, condition: "Nublado", rain: Math.random() * 100 },
-              { day: "Qua", temp: data.temp + 1, condition: "Ensolarado", rain: Math.random() * 100 },
-              { day: "Qui", temp: data.temp + 2, condition: "Ensolarado", rain: Math.random() * 100 },
-            ],
-          })
-          setLoading(false)
-        }, 1000)
-      } catch (error) {
-        console.error("Erro ao buscar dados climáticos:", error)
-        setLoading(false)
-      }
+    if (!navigator.geolocation) {
+      setLocationError("Geolocalização não é suportada neste navegador")
+      setLoading(false)
+      return
     }
 
-    fetchWeather()
-  }, [selectedLocation])
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+
+        try {
+          // Simular reverse geocoding para obter cidade/estado
+          const locationData = await reverseGeocode(latitude, longitude)
+          setLocation(locationData)
+
+          // Buscar dados climáticos para a localização
+          await fetchWeatherForLocation(locationData)
+        } catch (error) {
+          console.error("Erro ao obter dados de localização:", error)
+          setLocationError("Erro ao obter dados de localização")
+          // Usar localização padrão
+          await fetchWeatherForLocation({
+            latitude: -23.5505,
+            longitude: -46.6333,
+            city: "São Paulo",
+            state: "SP",
+          })
+        }
+      },
+      (error) => {
+        console.error("Erro de geolocalização:", error)
+        setLocationError("Não foi possível obter sua localização")
+        // Usar localização padrão
+        fetchWeatherForLocation({
+          latitude: -23.5505,
+          longitude: -46.6333,
+          city: "São Paulo",
+          state: "SP",
+        })
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000, // 5 minutos
+      },
+    )
+  }
+
+  // Simular reverse geocoding
+  const reverseGeocode = async (lat: number, lon: number): Promise<LocationData> => {
+    // Em produção, usaria uma API real como Google Maps ou OpenCage
+    const cities = [
+      { lat: -23.5505, lon: -46.6333, city: "São Paulo", state: "SP" },
+      { lat: -22.9068, lon: -43.1729, city: "Rio de Janeiro", state: "RJ" },
+      { lat: -19.9208, lon: -43.9378, city: "Belo Horizonte", state: "MG" },
+      { lat: -30.0346, lon: -51.2177, city: "Porto Alegre", state: "RS" },
+      { lat: -25.4284, lon: -49.2577, city: "Curitiba", state: "PR" },
+      { lat: -3.7319, lon: -38.5267, city: "Fortaleza", state: "CE" },
+      { lat: -8.0476, lon: -34.877, city: "Recife", state: "PE" },
+      { lat: -12.9714, lon: -38.5014, city: "Salvador", state: "BA" },
+      { lat: -15.8267, lon: -47.9218, city: "Brasília", state: "DF" },
+      { lat: -16.6864, lon: -49.2643, city: "Goiânia", state: "GO" },
+    ]
+
+    // Encontrar cidade mais próxima
+    let closest = cities[0]
+    let minDistance = Math.sqrt(Math.pow(lat - closest.lat, 2) + Math.pow(lon - closest.lon, 2))
+
+    cities.forEach((city) => {
+      const distance = Math.sqrt(Math.pow(lat - city.lat, 2) + Math.pow(lon - city.lon, 2))
+      if (distance < minDistance) {
+        minDistance = distance
+        closest = city
+      }
+    })
+
+    return {
+      latitude: lat,
+      longitude: lon,
+      city: closest.city,
+      state: closest.state,
+    }
+  }
+
+  // Buscar dados climáticos para localização específica
+  const fetchWeatherForLocation = async (locationData: LocationData) => {
+    try {
+      // Simular dados climáticos baseados na localização
+      const weatherConditions = ["Ensolarado", "Parcialmente nublado", "Nublado", "Chuvoso"]
+      const baseTemp = locationData.latitude > -15 ? 28 : locationData.latitude > -25 ? 24 : 20
+
+      const weatherData: WeatherData = {
+        temperature: baseTemp + Math.round((Math.random() - 0.5) * 8),
+        humidity: 50 + Math.round(Math.random() * 40),
+        windSpeed: 5 + Math.round(Math.random() * 20),
+        condition: weatherConditions[Math.floor(Math.random() * weatherConditions.length)],
+        location: `${locationData.city}, ${locationData.state}`,
+        forecast: Array.from({ length: 5 }, (_, i) => ({
+          day: ["Hoje", "Amanhã", "Ter", "Qua", "Qui"][i],
+          temp: baseTemp + Math.round((Math.random() - 0.5) * 6),
+          condition: weatherConditions[Math.floor(Math.random() * weatherConditions.length)],
+          rain: Math.round(Math.random() * 100),
+        })),
+      }
+
+      setWeather(weatherData)
+    } catch (error) {
+      console.error("Erro ao buscar dados climáticos:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getCurrentLocation()
+  }, [])
 
   const getWeatherIcon = (condition: string) => {
     switch (condition.toLowerCase()) {
@@ -97,12 +172,37 @@ export function WeatherWidget() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Condições Climáticas</CardTitle>
+          <CardTitle className="flex items-center space-x-2">
+            <MapPin className="h-5 w-5 text-green-500" />
+            <span>Condições Climáticas</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-            <span className="ml-2">Carregando dados climáticos...</span>
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+            <span className="ml-2">Obtendo sua localização...</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (locationError && !weather) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <MapPin className="h-5 w-5 text-red-500" />
+            <span>Condições Climáticas</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center space-y-4">
+            <p className="text-red-600">{locationError}</p>
+            <Button onClick={getCurrentLocation} variant="outline">
+              <MapPin className="h-4 w-4 mr-2" />
+              Tentar Novamente
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -127,21 +227,16 @@ export function WeatherWidget() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            {getWeatherIcon(weather?.condition || "")}
+            {getWeatherIcon(weather.condition)}
             <span>Condições Climáticas</span>
           </div>
-          <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {availableLocations.map((location) => (
-                <SelectItem key={location} value={location}>
-                  {location}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <MapPin className="h-4 w-4" />
+            <span>{weather.location}</span>
+            <Button onClick={getCurrentLocation} variant="ghost" size="sm">
+              Atualizar
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -177,7 +272,7 @@ export function WeatherWidget() {
                 <p className="text-xs font-medium">{day.day}</p>
                 <div className="my-2 flex justify-center">{getWeatherIcon(day.condition)}</div>
                 <p className="text-sm font-bold">{day.temp}°C</p>
-                <p className="text-xs text-blue-600">{day.rain}%</p>
+                <p className="text-xs text-blue-600">{Math.round(day.rain)}%</p>
               </div>
             ))}
           </div>
