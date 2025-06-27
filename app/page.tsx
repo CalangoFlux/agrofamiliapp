@@ -27,12 +27,14 @@ import {
   Target,
   Zap,
   ExternalLink,
+  Globe,
 } from "lucide-react"
 import { DatabaseStatus } from "@/components/database-status"
 import { AgroecologySection } from "@/components/agroecology-section"
 import { WeatherWidget } from "@/components/weather-widget"
 import { NewsSection } from "@/components/news-section"
 import { NewsAutomationGuide } from "@/components/news-automation-guide"
+import { ClimateCreditsSection } from "@/components/climate-credits-section"
 
 interface WeatherData {
   temperature: number
@@ -185,7 +187,7 @@ export default function AgroFamiliApp() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9 lg:grid-cols-9">
             <TabsTrigger value="dashboard" className="flex items-center space-x-1">
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Dashboard</span>
@@ -205,6 +207,10 @@ export default function AgroFamiliApp() {
             <TabsTrigger value="agroecologia" className="flex items-center space-x-1">
               <Leaf className="h-4 w-4" />
               <span className="hidden sm:inline">Agroecologia</span>
+            </TabsTrigger>
+            <TabsTrigger value="creditos-climaticos" className="flex items-center space-x-1">
+              <Globe className="h-4 w-4" />
+              <span className="hidden sm:inline">Clima</span>
             </TabsTrigger>
             <TabsTrigger value="mercado" className="flex items-center space-x-1">
               <ShoppingCart className="h-4 w-4" />
@@ -598,6 +604,11 @@ export default function AgroFamiliApp() {
           {/* Agroecologia */}
           <TabsContent value="agroecologia" className="space-y-6">
             <AgroecologySection />
+          </TabsContent>
+
+          {/* Créditos Climáticos */}
+          <TabsContent value="creditos-climaticos" className="space-y-6">
+            <ClimateCreditsSection />
           </TabsContent>
 
           {/* Mercado */}
